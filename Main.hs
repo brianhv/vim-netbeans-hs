@@ -14,16 +14,23 @@ socketHandler src snk = src
                      $= lineToEvent
                      $= logItem
                      $= CL.map pickResponses
-                     $= CL.map encodeResponses
+                     $= flatten
+                     $= encodeResponse
                      $$ snk
 
 pickResponses :: VimEventType -> [VimCommandType]
 pickResponses StartupDone = [EditFile "/tmp/test.txt"]
 pickResponses _ = []
 
-encodeResponses :: [VimCommandType] -> BS.ByteString
-encodeResponses = BS.concat . map mkCommand where
-    mkCommand = encodeCommand (BufferID 1) (SequenceNum 1)
+flatten :: (Monad m) => Conduit [a] m a
+flatten = conduitState () push close where
+    push _ xs = return $ StateProducing () xs
+    close _   = return []
+
+encodeResponse :: (Monad m) => Conduit VimCommandType m BS.ByteString
+encodeResponse = conduitState 1 push close where
+    push state input = return $ StateProducing (state + 1) [encodeCommand (BufferID 1) (SequenceNum state) input]
+    close _ = return []
 
 lineToEvent :: (Monad i) => Conduit BS.ByteString i VimEventType
 lineToEvent = CL.map f where
