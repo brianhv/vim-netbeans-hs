@@ -39,4 +39,6 @@ logEvent = NeedInput push close where
 --unlines' = CL.map $ \t -> t `BS.append` BS.pack "\n"
 
 main :: IO ()
-main = runTCPServer (ServerSettings 3219 HostAny) socketHandler
+main = do
+    Prelude.putStrLn "Starting server"
+    runTCPServer (ServerSettings 3219 HostAny) socketHandler
