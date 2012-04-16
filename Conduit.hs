@@ -1,4 +1,7 @@
-module Conduit where
+module Conduit
+    ( vimApplication
+    , flatten
+) where
 
 import Control.Monad.IO.Class
 import qualified Data.ByteString.Char8 as BS

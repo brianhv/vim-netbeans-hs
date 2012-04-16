@@ -15,4 +15,4 @@ pickResponses _           = []
 main :: IO ()
 main = do
     Prelude.putStrLn "Starting server"
-    runTCPServer (ServerSettings 3219 HostAny) (vimApplication vimEventResponder)
+    runTCPServer (ServerSettings 3219 (Host "127.0.0.1")) (vimApplication vimEventResponder)

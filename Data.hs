@@ -1,4 +1,15 @@
-module Data where
+module Data
+    ( VimCommandType(..)
+    , VimFunctionType(..)
+    , VimEventType(..)
+    , VimEvent(..)
+    , VimReply(..)
+    , VimMessage(..)
+    , IdeMessage(..)
+    , SequenceNum(..)
+    , BufferID(..)
+    , messageTypeString
+) where
 
 newtype BufferID = BufferID Int deriving (Read)
 newtype SequenceNum = SequenceNum Int deriving (Read)
