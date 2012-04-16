@@ -31,9 +31,7 @@ lineToEvent = CL.map f where
 --printAndDiscard = NeedInput (\i -> liftIO (void $ BS.putStrLn i) >> printAndDiscard) mempty
 
 logEvent :: (MonadIO m) => Conduit VimEventType m VimEventType
-logEvent = NeedInput push close where
-    push i = HaveOutput (liftIO (void $ print i) >> NeedInput push close) (return ()) i
-    close  = mempty
+logEvent = CL.mapM printAndReturn where printAndReturn ev = liftIO $ print ev >> return ev
 
 --unlines' :: Monad m => Conduit ByteString m ByteString
 --unlines' = CL.map $ \t -> t `BS.append` BS.pack "\n"
