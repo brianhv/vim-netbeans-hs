@@ -3,7 +3,11 @@ module Serializer (encodeCommand) where
 import Data
 
 encodeCommand :: BufferID -> SequenceNum -> VimCommandType -> String
-encodeCommand bufID seqno command = show bufID ++ ":" ++ commandTypeToByteString command ++ "!" ++ show seqno ++ encodeCommandArgs command ++ "\n"
+encodeCommand bufferID sequenceNumber command = buf ++ ":" ++ cmd ++ "!" ++ seqno ++ args ++ "\n" where
+    buf   = show bufferID
+    cmd   = commandTypeString command
+    seqno = show sequenceNumber
+    args  = encodeCommandArgs command
 
 encodeStringArg :: String -> String
 encodeStringArg arg = " \"" ++ arg ++ "\""
