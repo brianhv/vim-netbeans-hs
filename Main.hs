@@ -12,7 +12,7 @@ socketHandler :: (MonadIO m) => Application m
 socketHandler src snk = src
                      $= CB.lines
                      $= lineToEvent
-                     $= logEvent
+                     $= logItem
                      $= CL.map pickResponses
                      $= CL.map encodeResponses
                      $$ snk
@@ -32,17 +32,8 @@ lineToEvent = CL.map f where
         Right (EventMessage (VimEvent _ _ t)) -> t
         Right (ReplyMessage (VimReply _))     -> InvalidEvent "Actually, just got a reply..."
 
--- eventToByteString :: (Monad i) => Conduit VimEventType i ByteString
--- eventToByteString = CL.map (BS.pack . show)
-
---printAndDiscard :: Conduit ByteString IO ByteString
---printAndDiscard = NeedInput (\i -> liftIO (void $ BS.putStrLn i) >> printAndDiscard) mempty
-
-logEvent :: (MonadIO m) => Conduit VimEventType m VimEventType
-logEvent = CL.mapM printAndReturn where printAndReturn ev = liftIO $ print ev >> return ev
-
---unlines' :: Monad m => Conduit ByteString m ByteString
---unlines' = CL.map $ \t -> t `BS.append` BS.pack "\n"
+logItem :: (MonadIO m, Show a) => Conduit a m a
+logItem = CL.mapM printAndReturn where printAndReturn ev = liftIO $ print ev >> return ev
 
 main :: IO ()
 main = do
