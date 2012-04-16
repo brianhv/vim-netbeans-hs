@@ -1,0 +1,14 @@
+Name:                netbeans
+Version:             0.0
+Synopsis:            Implementation of netbeans interface for vim
+Description:         Allows haskell to communicate with a vim instance
+                     using the netbeans protocol
+License:             BSD4
+License-file:        LICENSE
+Author:              Brian Victor
+Maintainer:          Brian Victor <brianhv@brianhv.org>
+Build-Depends:       base, network-conduit
+
+Executable:          netbeans
+Main-is:             Netbeans.hs
+

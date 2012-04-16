@@ -1,0 +1,16 @@
+Vim Netbeans Protocol for Haskell
+=================================
+
+Library to allow remote control of vim using the
+[netbeans protocol](http://vimdoc.sourceforge.net/htmldoc/netbeans.html).
+
+Status
+------
+
+This project is very experimental. In addition, there are notable limitations
+in vim's implementation of the protocol. For example:
+
+* Remotely editing the buffer causes the undo list to be cleared.
+* The "insert" command always appends to the line, even if the insertion
+  point is in the middle of the line.
+  ([patch](http://permalink.gmane.org/gmane.editors.vim.devel/34157))
