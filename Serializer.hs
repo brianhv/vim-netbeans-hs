@@ -4,13 +4,16 @@ import Data
 import Data.ByteString hiding (concat, pack)
 import Data.ByteString.Char8 hiding (concat)
 
-encodeCommand :: BufferID -> SequenceNum -> VimCommandType -> ByteString
-encodeCommand bufferID sequenceNumber command = pack commandLine where
-    commandLine = buf ++ ":" ++ cmd ++ "!" ++ seqno ++ args ++ "\n"
+encodeCommand :: BufferID -> SequenceNum -> IdeMessage -> ByteString
+encodeCommand bufferID sequenceNumber message = pack commandLine where
+    commandLine = buf ++ ":" ++ cmd ++ separator ++ seqno ++ args ++ "\n"
     buf         = show bufferID
-    cmd         = commandTypeString command
+    cmd         = messageTypeString message
     seqno       = show sequenceNumber
-    args        = encodeCommandArgs command
+    args        = encodeMessageArgs message
+    separator   = case message of
+                    CommandMessage _  -> "!"
+                    FunctionMessage _ -> "/"
 
 encodeStringArg :: String -> String
 encodeStringArg arg = " \"" ++ arg ++ "\""
@@ -21,6 +24,16 @@ encodeIntArg arg = ' ' : show arg
 encodeBoolArg :: Bool -> String
 encodeBoolArg True  = " T"
 encodeBoolArg False = " F"
+
+encodeMessageArgs :: IdeMessage -> String
+encodeMessageArgs (CommandMessage m)  = encodeCommandArgs m
+encodeMessageArgs (FunctionMessage f) = encodeFunctionArgs f
+
+encodeFunctionArgs :: VimFunctionType -> String
+encodeFunctionArgs (GetAnno serNum)  = encodeIntArg serNum
+encodeFunctionArgs (Insert off text) = encodeIntArg off ++ encodeStringArg text
+encodeFunctionArgs (Remove off len)  = encodeIntArg off ++ encodeIntArg len
+encodeFunctionArgs _                 = ""
 
 -- Can this be refactored using Data.Data?
 encodeCommandArgs :: VimCommandType -> String

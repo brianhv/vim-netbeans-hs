@@ -65,19 +65,6 @@ data VimFunctionType = GetDot
                      | Remove Int Int
                      | SaveAndExit
 
-{-
-getDot
-getCursor
-getLength
-getMark
-getAnno serNum
-getModified
-getText
-insert off text
-remove off length
-saveAndExit
--}
-
 data VimEventType = BalloonEval Int Int String
                   | BalloonText String
                   | ButtonRelease Int Int Int
@@ -155,13 +142,17 @@ commandTypeString (Unguard _ _)         = "unguard"
 commandTypeString (Version)             = "version"
 
 functionTypeString :: VimFunctionType -> String
-functionTypeString (GetDot) = "getDot"
-functionTypeString (GetCursor) = "getCursor"
-functionTypeString (GetLength) = "getLength"
-functionTypeString (GetMark) = "getMark"
-functionTypeString (GetAnno _) = "getAnno"
+functionTypeString (GetDot)      = "getDot"
+functionTypeString (GetCursor)   = "getCursor"
+functionTypeString (GetLength)   = "getLength"
+functionTypeString (GetMark)     = "getMark"
+functionTypeString (GetAnno _)   = "getAnno"
 functionTypeString (GetModified) = "getModified"
-functionTypeString (GetText) = "getText"
-functionTypeString (Insert _ _) = "insert"
-functionTypeString (Remove _ _) = "remove"
+functionTypeString (GetText)     = "getText"
+functionTypeString (Insert _ _)  = "insert"
+functionTypeString (Remove _ _)  = "remove"
 functionTypeString (SaveAndExit) = "saveAndExit"
+
+messageTypeString :: IdeMessage -> String
+messageTypeString (CommandMessage m)  = commandTypeString m
+messageTypeString (FunctionMessage f) = functionTypeString f
