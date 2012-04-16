@@ -55,13 +55,13 @@ parseEvent = do
         "fileModified"  -> pure FileModified
         "fileOpened"    -> FileOpened <$> parseStringArg <*> parseBoolArg <*> parseBoolArg
         "geometry"      -> Geometry <$> parseNumberArg <*> parseNumberArg <*> parseNumberArg <*> parseNumberArg
-        "insert"        -> Insert <$> parseNumberArg <*> parseStringArg
+        "insert"        -> InsertEvent <$> parseNumberArg <*> parseStringArg
         "invokeAction"  -> pure InvokeAction
         "keyCommand"    -> KeyCommand <$> parseStringArg
         "keyAtPos"      -> KeyAtPos <$> parseStringArg <*> parseNumberArg <*> parseNumberArg
         "killed"        -> pure Killed
         "newDotAndMark" -> NewDotAndMark <$> parseNumberArg <*> parseNumberArg
-        "remove"        -> Remove <$> parseNumberArg <*> parseNumberArg
+        "remove"        -> RemoveEvent <$> parseNumberArg <*> parseNumberArg
         "quit"          -> pure Quit
         "revert"        -> pure Revert
         "save"          -> pure SaveEvent

@@ -54,6 +54,29 @@ data VimCommandType = ActionMenuItem
                     | Version
     deriving (Show)
 
+data VimFunctionType = GetDot
+                     | GetCursor
+                     | GetLength
+                     | GetMark
+                     | GetAnno Int
+                     | GetModified
+                     | GetText
+                     | Insert Int String
+                     | Remove Int Int
+                     | SaveAndExit
+
+{-
+getDot
+getCursor
+getLength
+getMark
+getAnno serNum
+getModified
+getText
+insert off text
+remove off length
+saveAndExit
+-}
 
 data VimEventType = BalloonEval Int Int String
                   | BalloonText String
@@ -63,14 +86,14 @@ data VimEventType = BalloonEval Int Int String
                   | FileModified
                   | FileOpened String Bool Bool
                   | Geometry Int Int Int Int
-                  | Insert Int String
+                  | InsertEvent Int String
                   | InvalidEvent String
                   | InvokeAction
                   | KeyCommand String
                   | KeyAtPos String Int Int
                   | Killed
                   | NewDotAndMark Int Int
-                  | Remove Int Int
+                  | RemoveEvent Int Int
                   | Quit
                   | Revert
                   | SaveEvent
@@ -84,6 +107,7 @@ data VimEvent = VimEvent BufferID SequenceNum VimEventType
 data VimReply = VimReply SequenceNum
 
 data VimMessage = EventMessage VimEvent | ReplyMessage VimReply
+data IdeMessage = CommandMessage VimCommandType | FunctionMessage VimFunctionType
 
 commandTypeString :: VimCommandType -> String
 commandTypeString (ActionMenuItem)      = "actionMenuItem"
@@ -129,3 +153,15 @@ commandTypeString (StopCaretListen)     = "stopCaretListen"
 commandTypeString (StopDocumentListen)  = "stopDocumentListen"
 commandTypeString (Unguard _ _)         = "unguard"
 commandTypeString (Version)             = "version"
+
+functionTypeString :: VimFunctionType -> String
+functionTypeString (GetDot) = "getDot"
+functionTypeString (GetCursor) = "getCursor"
+functionTypeString (GetLength) = "getLength"
+functionTypeString (GetMark) = "getMark"
+functionTypeString (GetAnno _) = "getAnno"
+functionTypeString (GetModified) = "getModified"
+functionTypeString (GetText) = "getText"
+functionTypeString (Insert _ _) = "insert"
+functionTypeString (Remove _ _) = "remove"
+functionTypeString (SaveAndExit) = "saveAndExit"
