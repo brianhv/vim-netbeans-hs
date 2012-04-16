@@ -17,12 +17,12 @@ encodeBoolArg False = " F"
 
 -- Can this be refactored using Data.Data?
 encodeCommandArgs :: VimCommandType -> String
-encodeCommandArgs (AddAnno serNum typeNum off len)  = Prelude.concat
+encodeCommandArgs (AddAnno serNum typeNum off len)  = concat
                    [encodeIntArg serNum, encodeIntArg typeNum, encodeIntArg off,
                     encodeIntArg len]
 encodeCommandArgs (BalloonResult text)              = encodeStringArg text
 encodeCommandArgs (DefineAnnoType typeNum typeName tooltip glyphFile fg bg) =
-    Prelude.concat [encodeIntArg typeNum, encodeStringArg typeName,
+    concat [encodeIntArg typeNum, encodeStringArg typeName,
                     encodeStringArg tooltip, encodeStringArg glyphFile,
                     encodeStringArg fg, encodeStringArg bg]
 encodeCommandArgs (EditFile path)                   = encodeStringArg path
