@@ -1,13 +1,16 @@
 module Serializer (encodeCommand) where
 
 import Data
+import Data.ByteString hiding (concat, pack)
+import Data.ByteString.Char8 hiding (concat)
 
-encodeCommand :: BufferID -> SequenceNum -> VimCommandType -> String
-encodeCommand bufferID sequenceNumber command = buf ++ ":" ++ cmd ++ "!" ++ seqno ++ args ++ "\n" where
-    buf   = show bufferID
-    cmd   = commandTypeString command
-    seqno = show sequenceNumber
-    args  = encodeCommandArgs command
+encodeCommand :: BufferID -> SequenceNum -> VimCommandType -> ByteString
+encodeCommand bufferID sequenceNumber command = pack commandLine where
+    commandLine = buf ++ ":" ++ cmd ++ "!" ++ seqno ++ args ++ "\n"
+    buf         = show bufferID
+    cmd         = commandTypeString command
+    seqno       = show sequenceNumber
+    args        = encodeCommandArgs command
 
 encodeStringArg :: String -> String
 encodeStringArg arg = " \"" ++ arg ++ "\""

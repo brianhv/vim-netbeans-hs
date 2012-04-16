@@ -14,7 +14,7 @@ socketHandler :: (MonadIO m) => Application m
 socketHandler src snk = src $= CB.lines $= lineToEvent $= logEvent $= CL.map pickResponse $$ snk -- $= lineToEvent $$ undefined
 
 pickResponse :: VimEventType -> ByteString
-pickResponse StartupDone = BS.pack $ encodeCommand (BufferID 1) (SequenceNum 1) $ EditFile "/tmp/test.txt"
+pickResponse StartupDone = encodeCommand (BufferID 1) (SequenceNum 1) $ EditFile "/tmp/test.txt"
 pickResponse _ = BS.pack ""
 
 lineToEvent :: (Monad i) => Conduit ByteString i VimEventType
