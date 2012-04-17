@@ -1,6 +1,7 @@
 module Conduit
     ( vimApplication
     , flatten
+    , fromList
 ) where
 
 import Control.Monad.IO.Class
@@ -16,6 +17,7 @@ import Parser
 vimApplication :: (MonadIO m) => Conduit VimEventType m IdeMessage -> Application m
 vimApplication responder src snk = src
                      $= CB.lines
+                     $= logItem
                      $= lineToEvent
                      $= logItem
                      $= responder
@@ -24,14 +26,20 @@ vimApplication responder src snk = src
                      $$ snk
 
 flatten :: (Monad m) => Conduit [a] m a
-flatten = conduitState () push close where
-    push _ xs = return $ StateProducing () xs
-    close _   = return []
+flatten = NeedInput push close where
+    push = fromList
+    close = Done Nothing ()
+
+fromList :: Monad m => [a] -> Pipe i a m ()
+fromList []     = Done Nothing ()
+fromList (x:xs) = HaveOutput (fromList xs) (return ()) x
 
 encodeResponse :: (Monad m) => Conduit IdeMessage m BS.ByteString
-encodeResponse = conduitState 1 push close where
-    push state input = return $ StateProducing (state + 1) [encodeCommand (BufferID 1) (SequenceNum state) input]
-    close _ = return []
+encodeResponse       = encode 1 where
+    encode seqno     = NeedInput (push seqno) close
+    push seqno input = HaveOutput (encode (seqno+1)) (return ()) $
+                        encodeCommand (BufferID 1) (SequenceNum seqno) input 
+    close            = Done Nothing ()
 
 lineToEvent :: (Monad i) => Conduit BS.ByteString i VimEventType
 lineToEvent = CL.map f where
