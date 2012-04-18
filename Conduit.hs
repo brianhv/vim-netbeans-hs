@@ -2,6 +2,7 @@ module Conduit
     ( vimApplication
     , flatten
     , fromList
+    , logItem
 ) where
 
 import Control.Monad.IO.Class
@@ -17,12 +18,12 @@ import Parser
 vimApplication :: (MonadIO m) => Conduit VimEventType m IdeMessage -> Application m
 vimApplication responder src snk = src
                      $= CB.lines
-                     $= logItem
+                     $= logItem "Raw event"
                      $= lineToEvent
-                     $= logItem
+                     $= logItem "Parsed event"
                      $= responder
                      $= encodeResponse
-                     $= logItem
+                     -- $= logItem
                      $$ snk
 
 flatten :: (Monad m) => Conduit [a] m a
@@ -48,5 +49,9 @@ lineToEvent = CL.map f where
         Right (EventMessage (VimEvent _ _ t)) -> t
         Right (ReplyMessage (VimReply _))     -> InvalidEvent "Actually, just got a reply..."
 
-logItem :: (MonadIO m, Show a) => Conduit a m a
-logItem = CL.mapM printAndReturn where printAndReturn ev = liftIO $ print ev >> return ev
+logItem :: (MonadIO m, Show a) => String -> Conduit a m a
+logItem description = CL.mapM printAndReturn where
+    printAndReturn ev = liftIO $ putStrLn (lineToPrint ev) >> return ev
+    lineToPrint ev    = case description of
+        "" -> show ev
+        _  -> description ++ ": " ++ show ev
