@@ -1,14 +1,14 @@
 import Data.Conduit.Network
 import Data.Conduit
-import qualified Data.Conduit.List as CL
 import Data
 import Conduit
 
 vimEventResponder :: (Monad a) => Conduit VimEventType a IdeMessage
-vimEventResponder = CL.map responses =$= flatten where
-    responses StartupDone = [ CommandMessage $ EditFile "/tmp/test.txt"
-                            , FunctionMessage $ Insert 0 "Hello, world!"]
-    responses _           = []
+vimEventResponder = conduitState () push close where
+    push _ StartupDone = return $ StateProducing () [ CommandMessage $ EditFile "/tmp/test.txt"
+                                                    , FunctionMessage $ Insert 0 "Hello, world!"]
+    push _ _           = return $ StateProducing () []
+    close _            = return []
 
 main :: IO ()
 main = do
