@@ -11,8 +11,8 @@ module Data
     , messageTypeString
 ) where
 
-newtype BufferID = BufferID Int deriving (Read)
-newtype SequenceNum = SequenceNum Int deriving (Read)
+newtype BufferID = BufferID Int deriving (Read, Eq)
+newtype SequenceNum = SequenceNum Int deriving (Read, Eq)
 
 instance Show BufferID where
     show (BufferID i) = show i
@@ -63,7 +63,7 @@ data VimCommandType = ActionMenuItem
                     | StopDocumentListen
                     | Unguard Int Int
                     | Version
-    deriving (Show)
+    deriving (Show, Eq)
 
 data VimFunctionType = GetDot
                      | GetCursor
@@ -98,13 +98,13 @@ data VimEventType = BalloonEval Int Int String
                   | StartupDone
                   | Unmodified
                   | VersionEvent String
-     deriving (Show)
+     deriving (Show, Eq)
 
-data VimEvent = VimEvent BufferID SequenceNum VimEventType
+data VimEvent = VimEvent BufferID SequenceNum VimEventType deriving (Eq, Show)
 
-data VimReply = VimReply SequenceNum
+data VimReply = VimReply SequenceNum deriving (Eq, Show)
 
-data VimMessage = EventMessage VimEvent | ReplyMessage VimReply
+data VimMessage = EventMessage VimEvent | ReplyMessage VimReply deriving (Eq, Show)
 data IdeMessage = CommandMessage VimCommandType | FunctionMessage VimFunctionType
 
 commandTypeString :: VimCommandType -> String
