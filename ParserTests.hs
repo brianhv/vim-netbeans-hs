@@ -1,23 +1,40 @@
+import Control.Monad
 import Test.HUnit
 import Data.ByteString.Char8 as BS
 import Parser
 import Data
 
-test1 :: Test
-test1 = TestCase (assertEqual "File open event should parse correctly" expected actual) where
-    expected = EventMessage $ VimEvent bufid seqno $ FileOpened "/tmp/foo.txt" True False
-    --actual   = case parseVimLine (BS.pack "0:fileOpened=0 \"/tmp/foo.txt\" T F") of
-    actual   = case parseVimLine test1line of
-        Left _  -> undefined
-        Right v -> v
-    bufid = BufferID 1
-    seqno = SequenceNum 1
+parserTest :: String -> VimMessage -> Test
+parserTest line expected = TestCase t where
+    t = case parseVimLine (BS.pack line) of
+        Left e  -> assertFailure $ show e
+        Right v -> assertEqual "asdf" v expected
 
-test1line :: ByteString
-test1line = BS.pack "0:startupDone=1"
+testFileOpen :: Test
+testFileOpen = parserTest line expected where
+    line     = "0:fileOpened=1 \"/tmp/foo.txt\" T F"
+    expected = EventMessage $ VimEvent bufid seqno $ FileOpened "/tmp/foo.txt" True False
+    bufid    = BufferID 0
+    seqno    = SequenceNum 1
+
+testStartupDone :: Test
+testStartupDone = parserTest line expected where
+    line     = "1:startupDone=2"
+    expected = EventMessage $ VimEvent bufid seqno StartupDone
+    bufid    = BufferID 1
+    seqno    = SequenceNum 2
+
+testBareResponse :: Test
+testBareResponse = parserTest line expected where
+    line     = "1"
+    expected = ReplyMessage $ VimReply (SequenceNum 1)
+
+tests :: Test
+tests = TestList
+    [ TestLabel "FileOpened" testFileOpen
+    , TestLabel "StartupDone" testStartupDone
+    , TestLabel "Bare response" testBareResponse
+    ]
 
 main :: IO ()
-main = do
-    print test1line
-    _ <- runTestTT test1
-    return ()
+main = void $ runTestTT tests 
